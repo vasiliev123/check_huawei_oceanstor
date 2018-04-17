@@ -44,10 +44,10 @@ syntax:
   lsenclosure - show enclosure status
   lsinitiator - show initiator status (prints alias name for initiator)
   lsstoragepool - show storage_pool general status
--h --> Print This Help Screen
+-h --> Print this help screen
 
 Note :
-This check use ssh protocol.
+This check uses ssh protocol.
 "
 
 if [ "$hlp" = "yes" -o $# -lt 1 ]; then
