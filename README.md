@@ -1,9 +1,9 @@
 # Check Huawei OceanStor nagios plugin
 Plugin is a rework of the IBM v7000 - v7000 Unified plugin.\
 Original link:\
-https://exchange.nagios.org/directory/Plugins/Hardware/Storage-Systems/SAN-and-NAS/IBM-San-Volume-Controller/IBM-v7000--2D-v7000-Unified/details\
-\
-It is adapted to serve as a hardware check of the Huawei OceanStor and was tested on OceanStor 2600V3.\
+https://exchange.nagios.org/directory/Plugins/Hardware/Storage-Systems/SAN-and-NAS/IBM-San-Volume-Controller/IBM-v7000--2D-v7000-Unified/details
+
+It is adapted to serve as a hardware check of the Huawei OceanStor and was tested on OceanStor 2600V3.
 
 # Installation
 1. Make user on the Huawei OceanStor with read-only privileges
