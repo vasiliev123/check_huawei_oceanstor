@@ -15,6 +15,26 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 4. Check if it works :)
 
 # Usage
+Remember to ssh from this user account which will be checking the storage system.
+```
+# su - nagios
+Last login: Wed Apr 18 09:02:21 CEST 2018 on pts/0
+-bash-4.2$ /usr/local/bin/check_huawei_oceanstor.sh -H 192.168.1.100 -U nagios -c lsinitiator
+The authenticity of host '192.168.1.100 (192.168.1.100)' can't be established.
+ECDSA key fingerprint is SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ECDSA key fingerprint is MD5xxxxxxxxxxxxxxxxxxxxxxxxxx.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.1.100' (ECDSA) to the list of known hosts.
+
+CRITICAL: INITIATOR OFFLINE 
+ ATTENTION: INITIATOR host-1-port1 status: Offline 
+ ATTENTION: INITIATOR host-1-port2 status: Offline 
+ 
+-bash-4.2$
+
+```
+
+
 ```
 /path/to/script/check_huawei_oceanstor.sh -H [host name/ip address] -U [user defined on OceanStor] -c [one of{lslun, lsdisk, lsdiskdomain, lsenclosure, lsinitiator, lsstoragepool}] [-h prints help]
 
