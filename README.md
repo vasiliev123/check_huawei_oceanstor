@@ -5,6 +5,8 @@ https://exchange.nagios.org/directory/Plugins/Hardware/Storage-Systems/SAN-and-N
 
 It is adapted to serve as a hardware check of the Huawei OceanStor and was tested on OceanStor 2600V3.
 
+### PLEASE HAVE IN MIND THAT YOU STILL BETTER IMPLEMENT E-MAIL ALARMS ON THE STORAGE ITSELF!
+
 # Installation
 1. Make user on the Huawei OceanStor with read-only privileges.
 2. Add public ssh key through CLI to the user on OceanStor with the command: ```change user_ssh_auth_info general user_name=your_username auth_mode=publickey```
