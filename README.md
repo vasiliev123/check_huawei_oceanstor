@@ -56,3 +56,4 @@ CRITICAL: INITIATOR OFFLINE
 
 # TODO List
 - [ ] Add Health Status check to lsdisk {Normal,Pre-fail}
+- [ ] Add SSH known hosts check
