@@ -12,7 +12,8 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 2. Add public ssh key through CLI to the user on OceanStor with the command: ```change user_ssh_auth_info general user_name=your_username auth_mode=publickey```
 3. It will ask for the public key, copy and paste it.
 4. Make sure that user which will execute script has private key.
-4. Check if it works :)
+5. Try to execute script as user which will be checking the storage system (instructions below in Usage section)
+6. Profit :)
 
 # Usage
 Remember to ssh from this user account which will be checking the storage system.
