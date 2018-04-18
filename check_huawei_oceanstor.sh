@@ -11,7 +11,10 @@
 #
 #
 # CHANGELOG
-# 1.0.0
+# 1.0.1 18.04.2018
+# Minor changes in CRITICAL and WARNING displays
+#
+# 1.0.0 17.04.2018
 # First release after original script rebuild.
 
 ssh=/usr/bin/ssh
@@ -55,15 +58,14 @@ if [ "$hlp" = "yes" -o $# -lt 1 ]; then
   exit 0
 fi
 
-tmp_file=/tmp/oceanstor_$storage_$command.tmp
-tmp_file_OK=/tmp/oceanstor_OK.tmp
+tmp_file=oceanstor_$storage_$command.tmp
 outputInfo=""
 
 
 case $command in
   lslun)
       $ssh $user@$storage 'show lun general' |sed '1,4d' > $tmp_file
-      cat $tmp_file |awk '{printf $6}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $6}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: LUN OFFLINE \n"
       else
@@ -88,7 +90,7 @@ case $command in
   lsdisk)
       $ssh $user@$storage 'show disk general' |sed '1,4d' > $tmp_file
 
-      cat $tmp_file |awk '{printf $3}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $3}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: Disk OFFLINE \n"
       else
@@ -118,7 +120,7 @@ case $command in
 
   lsdiskdomain)
       $ssh $user@$storage 'show disk_domain general' |sed '1,4d' > $tmp_file
-      cat $tmp_file |awk '{printf $4}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $4}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: DISK DOMAIN OFFLINE \n"
       else
@@ -144,7 +146,7 @@ case $command in
       $ssh $user@$storage 'show enclosure' |sed '1,4d' > $tmp_file
       sed -i -e "s/Expansion Enclosure/ExpansionEnclosure/g" $tmp_file
 
-      cat $tmp_file |awk '{printf $4}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $4}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: Enclosure OFFLINE \n"
       else
@@ -169,7 +171,7 @@ case $command in
 
   lsinitiator)
       $ssh $user@$storage 'show initiator' |sed '1,4d' > $tmp_file
-      cat $tmp_file |awk '{printf $2}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: INITIATOR OFFLINE \n"
       else
@@ -193,7 +195,7 @@ case $command in
 
   lsstoragepool)
       $ssh $user@$storage 'show storage_pool general' |sed '1,4d' > $tmp_file
-      cat $tmp_file |awk '{printf $5}' |grep -i Offline
+      cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
         outputInfo="$outputInfo CRITICAL: STORAGE POOL OFFLINE \n"
       else
