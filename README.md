@@ -1,3 +1,6 @@
+# PLUGIN IS STILL IN DEVELOPMENT
+
+
 # Check Huawei OceanStor nagios plugin
 Plugin is a rework of the IBM v7000 - v7000 Unified plugin.\
 Original link:\
