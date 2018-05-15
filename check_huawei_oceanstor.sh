@@ -7,7 +7,7 @@
 # Now it is adapted by Jurij Vasiliev to check the hardware status of Huawei OceanStor.
 # To use it you need to add user and ssh key on the OceanStor and your Linux machine.
 # Try to log from linux machine to the OceanStor without password, if it succeeds you can use the plugin.
-# The help is included into the script.
+# The help is included in the script.
 #
 #
 # CHANGELOG
