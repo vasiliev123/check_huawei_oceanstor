@@ -4,7 +4,7 @@
 # Version	1.0.2
 #
 # This plugin was originally made to check the hardware of IBM V7000 and was developed by Lazzarin Alberto.
-# Now it is adapted by Grzegorz Was to check the hardware status of Huawei OceanStor.
+# Now it is adapted by Jurij Vasiliev to check the hardware status of Huawei OceanStor.
 # To use it you need to add user and ssh key on the OceanStor and your Linux machine.
 # Try to log from linux machine to the OceanStor without password, if it succeeds you can use the plugin.
 # The help is included into the script.
