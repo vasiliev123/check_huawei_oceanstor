@@ -8,7 +8,7 @@ https://exchange.nagios.org/directory/Plugins/Hardware/Storage-Systems/SAN-and-N
 
 It is adapted to serve as a hardware check of the Huawei OceanStor and was tested on OceanStor 2600V3.
 
-### PLEASE HAVE IN MIND THAT YOU STILL BETTER IMPLEMENT E-MAIL ALARMS ON THE STORAGE ITSELF!
+### PLEASE HAVE IN MIND THAT YOU STILL BETTER IMPLEMENT MAIL ALARMS ON THE STORAGE ITSELF!
 
 # Installation
 1. Make user on the Huawei OceanStor with read-only privileges.
@@ -55,5 +55,4 @@ CRITICAL: INITIATOR OFFLINE
 ```
 
 # TODO List
-- [ ] Add Health Status check to lsdisk {Normal,Pre-fail}
 - [ ] Add SSH known hosts check
