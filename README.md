@@ -53,3 +53,7 @@ CRITICAL: INITIATOR OFFLINE
    lsstoragepool - show storage_pool general status
 -h --> Print this help screen
 ```
+
+# TODO List
+- [ ] Add Health Status check to lsdisk {Normal,Pre-fail}
+- [ ] Add SSH known hosts check
