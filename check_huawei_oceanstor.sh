@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author:	Jurij Vasiliev
-# Date:		17.04.2018
-# Version	1.0.0
+# Date:		15.05.2018
+# Version	1.0.2
 #
 # This plugin was originally made to check the hardware of IBM V7000 and was developed by Lazzarin Alberto.
 # Now it is adapted by Grzegorz Was to check the hardware status of Huawei OceanStor.
@@ -11,18 +11,38 @@
 #
 #
 # CHANGELOG
+# 1.0.2 15.05.2018
+#  1. Added support for multiple statuses
+#  2. Rewrited all checks
+#  3. Changed the temp file initialization
+#
 # 1.0.1 18.04.2018
 # Minor changes in CRITICAL and WARNING displays
 #
 # 1.0.0 17.04.2018
 # First release after original script rebuild.
-
+#
+#
+#
+#
+#
+#
+#
+# SSH client binary file
 ssh=/usr/bin/ssh
-exitCode=0
+# Standard exit code is 0
+exit_code=0
+# OceanStor failed Health and Running status
+failed_health_status="(Offline|Pre-fail|Fault|--)"
+failed_running_status="(Offline|Reconstruction|--)"
 
+# variable with output info for nagios
+output_info=""
+
+# Get options from command
 while getopts 'H:U:c:d:h' OPT; do
   case $OPT in
-    H)  storage=$OPTARG;;
+    H)  storage_system=$OPTARG;;
     U)  user=$OPTARG;;
     c)  command=$OPTARG;;
     h)  help="yes";;
@@ -30,9 +50,12 @@ while getopts 'H:U:c:d:h' OPT; do
   esac
 done
 
-# usage
+# temp file for status
+tmp_file=oceanstor_$storage_system_$command.tmp
+
+# usage guide
 HELP="
-Check Huawei OceanStor through ssh (GPL licence)
+Check Huawei OceanStor through ssh
 
 usage: $0 [ -M value -U value -Q command -h ]
 
@@ -44,74 +67,71 @@ syntax:
   lslun - show lun general status
   lsdisk - show disk general status
   lsdiskdomain - show disk_domain general status
-  lsenclosure - show enclosure status
+  lsexpansionmodule - show expansiom module status
   lsinitiator - show initiator status (prints alias name for initiator)
   lsstoragepool - show storage_pool general status
 -h --> Print this help screen
 
-Note :
+Note:
 This check uses ssh protocol.
 "
 
-if [ "$hlp" = "yes" -o $# -lt 1 ]; then
+# If -h and wrong arg then show help guide
+if [ "$help" = "yes" -o $# -lt 1 ]; then
   echo "$HELP"
   exit 0
 fi
 
-tmp_file=oceanstor_$storage_$command.tmp
-outputInfo=""
-
-
 case $command in
   lslun)
-      $ssh $user@$storage 'show lun general' |sed '1,4d' > $tmp_file
-      cat_status=$(cat $tmp_file |awk '{printf $6}' |grep -i Offline)
+      $ssh $user@$storage_system 'show lun general' |sed '1,4d' > $tmp_file
+      cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -E "$failed_health_status")
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: LUN OFFLINE \n"
+        output_info="$output_info CRITICAL: check your LUN status \n"
       else
-        outputInfo="$outputInfo OK: All LUNs Online \n"
+        output_info="$output_info OK: All LUNs Online \n"
       fi
 
       while read line
       do
         lun_name=$(echo "${line}" | awk '{printf $2}')
-        lun_status=$(echo "${line}" | awk '{printf $6}')
+        lun_status=$(echo "${line}" | awk '{printf $5}')
 
-        if [ $lun_status = "Online" ]; then
-          outputInfo="$outputInfo OK: LUN $lun_name status: $lun_status \n"
+        if [ $lun_status = "Normal" ]; then
+          output_info="$output_info OK: LUN $lun_name status: $lun_status \n"
         else
-          outputInfo="$outputInfo ATTENTION: LUN $lun_name status: $lun_status \n"
-          exitCode=2
+          output_info="$output_info ATTENTION: LUN $lun_name status: $lun_status \n"
+          exit_code=2
         fi
 
       done < $tmp_file
       ;;
 
   lsdisk)
-      $ssh $user@$storage 'show disk general' |sed '1,4d' > $tmp_file
+      $ssh $user@$storage_system 'show disk general' |sed '1,4d' > $tmp_file
 
-      cat_status=$(cat $tmp_file |awk '{printf $3}' |grep -i Offline)
+      cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -E "$failed_health_status")
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: Disk OFFLINE \n"
+        output_info="$output_info CRITICAL: check your DISK status \n"
       else
-        outputInfo="$outputInfo OK: Disk \n"
+        output_info="$output_info OK: All DISKs Online and Healthy \n"
       fi
 
       drive_total=$(/bin/cat $tmp_file |/usr/bin/wc -l)
       while read line
       do
         drive_n=$(echo "${line}" | awk '{printf $1}')
-        drive_status=$(echo "${line}" | awk '{printf $3}')
+        drive_status=$(echo "${line}" | awk '{printf $2}')
         drive_role=$(echo "${line}" | awk '{printf $6}')
         drive_type=$(echo "${line}" | awk '{printf $4}')
         drive_capacity=$(echo "${line}" | awk '{printf $5}')
         drive_slot=$(echo "${line}" | awk '{printf $1}')
 
-        if [ $drive_status = "Online" ]; then
-          outputInfo="$outputInfo OK: Disk $drive_n is online \n"
+        if [ $drive_status = "Normal" ]; then
+          output_info="$output_info OK: Disk $drive_n is online \n"
         else
-          outputInfo="$outputInfo ATTENTION: Disk $drive_n \nstatus: $disk_status \nrole: $drive_role \ntype: $drive_type \ncapacity: $drive_capacity \nenclosure: $drive_enclosure \nslot: $drive_slot "
-          exitCode=2
+          output_info="$output_info ATTENTION: Disk $drive_n \nstatus: $disk_status \nrole: $drive_role \ntype: $drive_type \ncapacity: $drive_capacity \nenclosure: $drive_enclosure \nslot: $drive_slot "
+          exit_code=2
         fi
 
       done < $tmp_file
@@ -119,99 +139,100 @@ case $command in
       ;;
 
   lsdiskdomain)
-      $ssh $user@$storage 'show disk_domain general' |sed '1,4d' > $tmp_file
-      cat_status=$(cat $tmp_file |awk '{printf $4}' |grep -i Offline)
+      $ssh $user@$storage_system 'show disk_domain general' |sed '1,4d' > $tmp_file
+      cat_status=$(cat $tmp_file |awk '{printf $3}' |grep -E "$failed_health_status")
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: DISK DOMAIN OFFLINE \n"
+        output_info="$output_info CRITICAL: check your DISK DOMAIN status \n"
       else
-        outputInfo="$outputInfo OK: All DISK DOMAINs Online \n"
+        output_info="$output_info OK: All DISK DOMAINs Online \n"
       fi
 
       while read line
       do
         disk_domain_name=$(echo "${line}" | awk '{printf $2}')
-        disk_domain_status=$(echo "${line}" | awk '{printf $4}')
+        disk_domain_health_status=$(echo "${line}" | awk '{printf $3}')
+        disk_domain_running_status=$(echo "${line}" | awk '{printf $4}')
 
-        if [ $disk_domain_status = "Online" ]; then
-          outputInfo="$outputInfo OK: DISK DOMAIN $disk_domain_name status: $disk_domain_status \n"
+        if [ $disk_domain_health_status = "Normal" ]; then
+          output_info="$output_info OK: DISK DOMAIN $disk_domain_name Health status: $disk_domain_health_status with Running status: $disk_domain_running_status \n"
         else
-          outputInfo="$outputInfo ATTENTION: DISK DOMAIN $disk_domain_name status: $disk_domain_status \n"
-          exitCode=2
+          output_info="$output_info ATTENTION: DISK DOMAIN $disk_domain_name Health status: $disk_domain_health_status with Running status: $disk_domain_running_status \n"
+          exit_code=2
         fi
 
       done < $tmp_file
       ;;
 
-  lsenclosure)
-      $ssh $user@$storage 'show enclosure' |sed '1,4d' > $tmp_file
-      sed -i -e "s/Expansion Enclosure/ExpansionEnclosure/g" $tmp_file
+  lsexpansionmodule)
+      $ssh $user@$storage_system 'show expansion_module' |sed '1,4d' > $tmp_file
 
-      cat_status=$(cat $tmp_file |awk '{printf $4}' |grep -i Offline)
+      cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -E "$failed_health_status")
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: Enclosure OFFLINE \n"
+        output_info="$output_info CRITICAL: check your EXPANSION MODULE status \n"
       else
-        outputInfo="$outputInfo OK: Enclosure \n"
+        output_info="$output_info OK: All EXPANSION MODULES are Online \n"
       fi
 
       while read line
       do
-        enc_n=$(echo "${line}" | awk '{printf $1}')
-        enc_status=$(echo "${line}" | awk '{printf $4}')
-        enc_health=$(echo "${line}" | awk '{printf $3}')
+        expansion_mod_id=$(echo "${line}" | awk '{printf $1}')
+        expansion_mod_health_status=$(echo "${line}" | awk '{printf $2}')
+        expansion_mod_running_status=$(echo "${line}" | awk '{printf $3}')
 
-        if [ $enc_status = "Online" ]; then
-          outputInfo="$outputInfo OK: Enclosure $enc_n status: $enc_status \n"
+        if [ $expansion_mod_running_status = "Running" ]; then
+          output_info="$output_info OK: EXAPNSION MODULE $expansion_mod_id Health status: $expansion_mod_health_status with Running status: $expansion_mod_running_status \n"
         else
-          outputInfo="$outputInfo ATTENTION: Enclosure $enc_n status: $enc_status \n"
-          exitCode=2
+          output_info="$output_info ATTENTION: EXPANSION MODULE $expansion_mod_id Health status: $expansion_mod_health_status with Running status: $expansion_mod_running_status \n"
+          exit_code=2
         fi
 
       done < $tmp_file
       ;;
 
   lsinitiator)
-      $ssh $user@$storage 'show initiator' |sed '1,4d' > $tmp_file
+      $ssh $user@$storage_system 'show initiator' |sed '1,4d' > $tmp_file
       cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -i Offline)
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: INITIATOR OFFLINE \n"
+        output_info="$output_info CRITICAL: INITIATOR OFFLINE \n"
       else
-        outputInfo="$outputInfo OK: All INITIATORs Online \n"
+        output_info="$output_info OK: All INITIATORs Online \n"
       fi
 
       while read line
       do
         initiator_name=$(echo "${line}" | awk '{printf $4}')
-        initiator_status=$(echo "${line}" | awk '{printf $2}')
+        initiator_running_status=$(echo "${line}" | awk '{printf $2}')
 
-        if [ $initiator_status = "Online" ]; then
-          outputInfo="$outputInfo OK: INITIATOR $initiator_name status: $initiator_status \n"
+        if [ $initiator_running_status = "Online" ]; then
+          output_info="$output_info OK: INITIATOR $initiator_name status: $initiator_running_status \n"
         else
-          outputInfo="$outputInfo ATTENTION: INITIATOR $initiator_name status: $initiator_status \n"
-          exitCode=2
+          output_info="$output_info ATTENTION: INITIATOR $initiator_name status: $initiator_running_status \n"
+          exit_code=2
         fi
 
       done < $tmp_file
       ;;
 
   lsstoragepool)
-      $ssh $user@$storage 'show storage_pool general' |sed '1,4d' > $tmp_file
-      cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -i Offline)
+      $ssh $user@$storage_system 'show storage_pool general' |sed '1,4d' > $tmp_file
+      cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -E "$failed_health_status")
       if [ "$?" -eq "0" ]; then
-        outputInfo="$outputInfo CRITICAL: STORAGE POOL OFFLINE \n"
+        output_info="$output_info CRITICAL: Check your STORAGE POOL status \n"
       else
-        outputInfo="$outputInfo OK: All STORAGE POOLs Online \n"
+        output_info="$output_info OK: All STORAGE POOLs Online \n"
       fi
 
       while read line
       do
         spool_name=$(echo "${line}" | awk '{printf $2}')
-        spool_status=$(echo "${line}" | awk '{printf $5}')
+        spool_health_status=$(echo "${line}" | awk '{printf $4}')
+        spool_running_status=$(echo "${line}" | awk '{printf $5}')
 
-        if [ $spool_status = "Online" ]; then
-          outputInfo="$outputInfo OK: STORAGE POOL $spool_name status: $spool_status \n"
+        if [ $spool_running_status = "Online" ]; then
+          output_info="$output_info OK: STORAGE POOL $spool_name Health status: $spool_health_status with Running status: $spool_running_status \n"
         else
-          outputInfo="$outputInfo ATTENTION: STORAGE POOL $spool_name status: $spool_status \n"
-          exitCode=2
+          output_info="$output_info ATTENTION: STORAGE POOL $spool_name Health status: $spool_health_status with Running status: $spool_running_status \n"
+          exit_code=2
         fi
 
       done < $tmp_file
@@ -224,5 +245,5 @@ case $command in
 esac
 
 rm $tmp_file
-echo -ne "$outputInfo\n"
-exit $exitCode
+echo -ne "$output_info\n"
+exit $exit_code
