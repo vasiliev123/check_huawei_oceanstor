@@ -1,5 +1,4 @@
-# PLUGIN IS STILL IN DEVELOPMENT
-
+# PLUGIN IS STILL IN DEVELOPMENT. ACTUALLY CHECKING IF IT WORKS IN REAL ENVIRONMENT
 
 # Check Huawei OceanStor nagios plugin
 Plugin is a rework of the IBM v7000 - v7000 Unified plugin.\
@@ -19,25 +18,7 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 6. Profit :)
 
 # Usage
-Remember to ssh from this user account which will be checking the storage system.
-```
-# su - nagios
-Last login: Wed Apr 18 09:02:21 CEST 2018 on pts/0
--bash-4.2$ /usr/local/bin/check_huawei_oceanstor.sh -H 192.168.1.100 -U nagios -c lsinitiator
-The authenticity of host '192.168.1.100 (192.168.1.100)' can't be established.
-ECDSA key fingerprint is SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-ECDSA key fingerprint is MD5xxxxxxxxxxxxxxxxxxxxxxxxxx.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '192.168.1.100' (ECDSA) to the list of known hosts.
-
-CRITICAL: INITIATOR OFFLINE 
- ATTENTION: INITIATOR host-1-port1 status: Offline 
- ATTENTION: INITIATOR host-1-port2 status: Offline 
- 
--bash-4.2$
-
-```
-
+**Check if the user which will be monitoring the storage system has the private key.**
 
 ```
 /path/to/script/check_huawei_oceanstor.sh -H [host name/ip address] -U [user defined on OceanStor] -c [one of{lslun, lsdisk, lsdiskdomain, lsexpansionmodule, lsinitiator, lsstoragepool}] [-h prints help]
@@ -57,4 +38,4 @@ This check uses ssh protocol.
 ```
 
 # TODO List
-- [ ] Add SSH known hosts check
+- [ ] Check if the plugin is working properly

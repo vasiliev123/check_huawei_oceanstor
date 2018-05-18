@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author:	Jurij Vasiliev
-# Date:		15.05.2018
-# Version	1.0.2
+# Date:		18.05.2018
+# Version	1.0.3
 #
 # This plugin was originally made to check the hardware of IBM V7000 and was developed by Lazzarin Alberto.
 # Now it is adapted by Jurij Vasiliev to check the hardware status of Huawei OceanStor.
@@ -11,6 +11,9 @@
 #
 #
 # CHANGELOG
+# 1.0.3 18.05.2018
+# Auto add storage system to known hosts
+#
 # 1.0.2 15.05.2018
 #  1. Added support for multiple statuses
 #  2. Rewrited all checks
@@ -28,8 +31,8 @@
 #
 #
 #
-# SSH client binary file
-ssh=/usr/bin/ssh
+# SSH client binary file auto add to known hosts
+ssh='/usr/bin/ssh -o StrictHostKeyChecking=no'
 # Standard exit code is 0
 exit_code=0
 # OceanStor failed Health and Running status
