@@ -1,6 +1,6 @@
-# PLUGIN IS STILL IN DEVELOPMENT. ACTUALLY CHECKING IF IT WORKS IN REAL ENVIRONMENT
+# PLUGIN IS STILL IN DEVELOPMENT. PLEASE PROVIDE INFORMATION ABOUT ANY FOUND BUGS.
 
-# Check Huawei OceanStor nagios plugin
+# Check Huawei OceanStor plugin for Nagios
 Plugin is a rework of the IBM v7000 - v7000 Unified plugin.\
 Original link:\
 https://exchange.nagios.org/directory/Plugins/Hardware/Storage-Systems/SAN-and-NAS/IBM-San-Volume-Controller/IBM-v7000--2D-v7000-Unified/details
