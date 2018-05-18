@@ -40,18 +40,20 @@ CRITICAL: INITIATOR OFFLINE
 
 
 ```
-/path/to/script/check_huawei_oceanstor.sh -H [host name/ip address] -U [user defined on OceanStor] -c [one of{lslun, lsdisk, lsdiskdomain, lsenclosure, lsinitiator, lsstoragepool}] [-h prints help]
+/path/to/script/check_huawei_oceanstor.sh -H [host name/ip address] -U [user defined on OceanStor] -c [one of{lslun, lsdisk, lsdiskdomain, lsexpansionmodule, lsinitiator, lsstoragepool}] [-h prints help]
 
 -H --> IP Address
 -U --> user
 -c --> command to storage
-   lslun - show lun general status
-   lsdisk - show disk general status
-   lsdiskdomain - show disk_domain general status
-   lsenclosure - show enclosure status
-   lsinitiator - show initiator status (prints alias name for initiator)
-   lsstoragepool - show storage_pool general status
+  lslun - show lun general status
+  lsdisk - show disk general status
+  lsdiskdomain - show disk_domain general status
+  lsexpansionmodule - show expansiom module status
+  lsinitiator - show initiator status (prints alias name for initiator)
+  lsstoragepool - show storage_pool general status
 -h --> Print this help screen
+Note:
+This check uses ssh protocol.
 ```
 
 # TODO List
