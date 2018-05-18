@@ -133,7 +133,7 @@ case $command in
         if [ $drive_status = "Normal" ]; then
           output_info="$output_info OK: Disk $drive_n is online \n"
         else
-          output_info="$output_info ATTENTION: Disk $drive_n \nstatus: $disk_status \nrole: $drive_role \ntype: $drive_type \ncapacity: $drive_capacity \nenclosure: $drive_enclosure \nslot: $drive_slot "
+          output_info="$output_info ATTENTION: Disk $drive_n \nstatus: $drive_status \nrole: $drive_role \ntype: $drive_type \ncapacity: $drive_capacity \nenclosure: $drive_enclosure \nslot: $drive_slot "
           exit_code=2
         fi
 
