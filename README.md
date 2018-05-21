@@ -38,4 +38,5 @@ This check uses ssh protocol.
 ```
 
 # TODO List
+- [ ] Add SSH timeout as critical
 - [ ] Check if the plugin is working properly
