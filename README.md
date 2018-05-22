@@ -9,7 +9,7 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 
 ### PLEASE HAVE IN MIND THAT YOU STILL BETTER IMPLEMENT MAIL ALARMS ON THE STORAGE ITSELF!
 
-# Installation
+# 1. Installation
 1. Make user on the Huawei OceanStor with read-only privileges.
 2. Add public ssh key through CLI to the user on OceanStor with the command: ```change user_ssh_auth_info general user_name=your_username auth_mode=publickey```
 3. It will ask for the public key, copy and paste it.
@@ -17,7 +17,7 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 5. Try to execute script as user which will be checking the storage system (instructions below in Usage section)
 6. Profit :)
 
-# Usage
+# 2. Usage
 **Check if the user which will be monitoring the storage system has the private key.**
 
 ```
@@ -36,6 +36,10 @@ It is adapted to serve as a hardware check of the Huawei OceanStor and was teste
 Note:
 This check uses ssh protocol.
 ```
+# 3. KNOWN ISSUES
+1. Storage Array have active WARNING: "The number of event logs is about to reach the upper limit of 50000."
+Details: This is because all ssh logins are put into the audit log.
+Resolution: Add server for log dumps on OceanStor or go to Alarm Settings and mask alarm "The Space That Stores Event Logs Is To Be Used Up"
 
-# TODO List
+# 4. TODO List
 - [ ] Check if the plugin is working properly
