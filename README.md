@@ -37,9 +37,9 @@ Note:
 This check uses ssh protocol.
 ```
 # 3. KNOWN ISSUES
-1. Storage Array have active WARNING: "The number of event logs is about to reach the upper limit of 50000."
-Details: This is because all ssh logins are put into the audit log.
-Resolution: Add server for log dumps on OceanStor or go to Alarm Settings and mask alarm "The Space That Stores Event Logs Is To Be Used Up"
+1. Storage Array have active WARNING: "The number of event logs is about to reach the upper limit of 50000."\
+Details: This is because all ssh logins are put into the audit log.\
+Resolution: Add server for log dumps on OceanStor or go to Alarm Settings and mask alarm "The Space That Stores Event Logs Is To Be Used Up"\
 
 # 4. TODO List
 - [ ] Check if the plugin is working properly
