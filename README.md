@@ -41,5 +41,10 @@ This check uses ssh protocol.
 Details: This is because all ssh logins are put into the audit log.\
 Resolution: Add server for log dumps on OceanStor or go to Alarm Settings and mask alarm "The Space That Stores Event Logs Is To Be Used Up"
 
+
+2. Integrated Storage Manager (ISM) sends warning message "Details: The CPU usage of process *ismcli* in controller (controller enclosure CTE0, controller 0A) exceeds the threshold 50%."\
+Details: ISM CLI gets to much load on CPU when you are doing concurrent querries from nagios\
+Resolution: Try not to query storage system with all the checks at the same time. I know it's harsh :)
+
 # 4. TODO List
 - [ ] Check if the plugin is working properly
