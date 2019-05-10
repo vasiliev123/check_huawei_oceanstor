@@ -1,4 +1,4 @@
-# PLUGIN IS STILL IN DEVELOPMENT. PLEASE PROVIDE INFORMATION ABOUT ANY FOUND BUGS.
+# THIS PLUGIN IS DISCONTINUED, PLEASE CHECK NEWEST VERSION IN PYTHON! https://github.com/vasiliev123/check-oceanstor.py
 
 # Check Huawei OceanStor plugin for Nagios
 Plugin is a rework of the IBM v7000 - v7000 Unified plugin.\
