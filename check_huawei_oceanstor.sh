@@ -1,7 +1,7 @@
 #!/bin/bash
-# Author:	Jurij Vasiliev
-# Date:		22.05.2018
-# Version	1.1.0
+# Author:       Jurij Vasiliev
+# Date:         10.09.2018
+# Version       1.2.0
 #
 # This plugin was originally made to check the hardware of IBM V7000 and was developed by Lazzarin Alberto.
 # Now it is adapted by Jurij Vasiliev to check the hardware status of Huawei OceanStor.
@@ -11,6 +11,9 @@
 #
 #
 # CHANGELOG
+# 1.2.0 10.09.2018 by Alexander Golikov
+# Version without TMP-Files, also modified ssh options with path to ssh-key
+#
 # 1.1.0 22.05.2018
 # Added support for checking SSH connections + few code changes and indents
 #
@@ -31,7 +34,7 @@
 #
 #
 # SSH client binary file with auto add to known_hosts
-ssh='/usr/bin/ssh -o StrictHostKeyChecking=no'
+ssh='/usr/bin/ssh -o StrictHostKeyChecking=no -i /etc/nagios/sshkey/oceanstor'
 
 # Standard exit code is 0
 exit_code=0
@@ -55,7 +58,8 @@ while getopts 'H:U:c:d:h' OPT; do
 done
 
 # temp file for status
-tmp_file=oceanstor_$storage_system_$command.tmp
+#tmp_file=/var/tsmp/oceanstor_$storage_system_$command.$(date +%s).tmp
+tmp_var=""
 
 # usage guide
 HELP="
@@ -88,8 +92,8 @@ fi
 
 ########################## FUNCTIONS ##########################
 
-function check_tmp_file {
-  if [ ! -s $tmp_file ]; then
+function check_tmp_var {
+  if [ -z "$tmp_var" ]; then
     output_info=" $1"
     echo -ne "$output_info\n"
     exit 1
@@ -100,11 +104,11 @@ function check_tmp_file {
 
 case $command in
   lslun)
-    $ssh $user@$storage_system 'show lun general' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show lun general' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no LUNs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no LUNs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -E "$failed_health_status")
+    cat_status=$(echo "$tmp_var" |awk '{printf $5}' |grep -E "$failed_health_status")
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: check your LUN status \n"
     else
@@ -123,22 +127,22 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   lsdisk)
-    $ssh $user@$storage_system 'show disk general' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show disk general' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no DISKs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no DISKs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -E "$failed_health_status")
+    cat_status=$(echo "$tmp_var" |awk '{printf $2}' |grep -E "$failed_health_status")
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: check your DISK status \n"
     else
       output_info="$output_info OK: All DISKs Online and Healthy \n"
     fi
 
-    drive_total=$(/bin/cat $tmp_file |/usr/bin/wc -l)
+    drive_total=$(echo "$tmp_var" |/usr/bin/wc -l)
     while read line
     do
       drive_n=$(echo "${line}" | awk '{printf $1}')
@@ -155,15 +159,15 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   lsdiskdomain)
-    $ssh $user@$storage_system 'show disk_domain general' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show disk_domain general' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no DISK DOMAINs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no DISK DOMAINs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $3}' |grep -E "$failed_health_status")
+    cat_status=$(echo "$tmp_var" |awk '{printf $3}' |grep -E "$failed_health_status")
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: check your DISK DOMAIN status \n"
     else
@@ -183,15 +187,15 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   lsexpansionmodule)
-    $ssh $user@$storage_system 'show expansion_module' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show expansion_module' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no EXPANSION MODULEs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no EXPANSION MODULEs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -E "$failed_health_status")
+    cat_status=$(echo "$tmp_var" |awk '{printf $2}' |grep -E "$failed_health_status")
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: check your EXPANSION MODULE status \n"
     else
@@ -211,15 +215,15 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   lsinitiator)
-    $ssh $user@$storage_system 'show initiator' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show initiator' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no INITIATORs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no INITIATORs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $2}' |grep -i Offline)
+    cat_status=$(echo "$tmp_var" |awk '{printf $2}' |grep -i Offline)
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: INITIATOR OFFLINE \n"
     else
@@ -238,15 +242,15 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   lsstoragepool)
-    $ssh $user@$storage_system 'show storage_pool general' |sed '1,4d' > $tmp_file
+    tmp_var=$($ssh $user@$storage_system 'show storage_pool general' |sed '1,4d')
 
-    check_tmp_file "WARNING: There are no STORAGE POOLs or your SSH key/connection is wrong"
+    check_tmp_var "WARNING: There are no STORAGE POOLs or your SSH key/connection is wrong"
 
-    cat_status=$(cat $tmp_file |awk '{printf $5}' |grep -E "$failed_health_status")
+    cat_status=$(echo "$tmp_var" |awk '{printf $5}' |grep -E "$failed_health_status")
     if [ "$?" -eq "0" ]; then
       output_info="$output_info CRITICAL: Check your STORAGE POOL status \n"
     else
@@ -266,7 +270,7 @@ case $command in
         exit_code=2
       fi
 
-    done < $tmp_file
+    done < <(echo "$tmp_var")
   ;;
 
   *)
@@ -275,6 +279,6 @@ case $command in
   ;;
 esac
 
-rm $tmp_file
+#rm $tmp_file
 echo -ne "$output_info\n"
 exit $exit_code
